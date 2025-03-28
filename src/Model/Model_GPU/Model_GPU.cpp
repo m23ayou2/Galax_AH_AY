@@ -48,6 +48,7 @@ Model_GPU
   velocitiesf3   (n_particles),
   accelerationsf3(n_particles)
 {
+
 	// init cuda
 	cudaError_t cudaStatus;
 
@@ -69,20 +70,36 @@ Model_GPU
 	}
 
 	cuda_malloc((void**)&positionsGPU,     n_particles * sizeof(float3));
+	cuda_malloc((void**)&accelerationsGPU,     n_particles * sizeof(float3));
+	cuda_malloc((void**)&velocitiesGPU,     n_particles * sizeof(float3));
+
+	cuda_malloc((void**)&massesGPU,     n_particles * sizeof(float));
+
+
+	cuda_memcpy(velocitiesGPU,  velocitiesf3.data()     , n_particles * sizeof(float3), cudaMemcpyHostToDevice);
 
 	cuda_memcpy(positionsGPU,  positionsf3.data()     , n_particles * sizeof(float3), cudaMemcpyHostToDevice);
+	cuda_memcpy(massesGPU,  initstate.masses.data()     , n_particles * sizeof(float), cudaMemcpyHostToDevice);
+
+
 }
 
 Model_GPU
 ::~Model_GPU()
 {
-	cudaFree((void**)&positionsGPU);
+	cudaFree(positionsGPU);
 }
 
 void Model_GPU
 ::step()
 {
+	//int cuda_err = cudaMemset(accelerationsGPU, 0, n_particles* sizeof(float3));
+
+	update_position_gpu(positionsGPU, velocitiesGPU, accelerationsGPU, massesGPU, n_particles);
+	
+
 	cuda_memcpy(positionsf3.data(), positionsGPU, n_particles * sizeof(float3), cudaMemcpyDeviceToHost);
+
 	for (int i = 0; i < n_particles; i++)
 	{
 		particles.x[i] = positionsf3[i].x;

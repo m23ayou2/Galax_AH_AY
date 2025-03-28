@@ -13,6 +13,8 @@ public:
     virtual ~Model_CPU_fast() = default;
 
     virtual void step();
+    virtual void step_v2();
+
 };
 #endif // MODEL_CPU_FAST_HPP_
 

@@ -123,7 +123,7 @@ int main(int argc, char ** argv)
 			std::cout << " ;               average distance vs reference: " << average_error
                                   << "; min error : " << error_min << "; max error : " << error_max;
 		}
-		std::cout << "\r" << std::flush;
+		std::cout << std::endl << std::flush;
 	}
 
 	return EXIT_SUCCESS;
